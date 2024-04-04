@@ -3,6 +3,7 @@
 namespace Gestao_de_Alunos
 {
     // Estrutura de dados para representar um Aluno
+    // Autores : Gabriel / Rui / Douglas 
     public class sAluno
     {
         public string codAlu; // código do aluno (string)
@@ -700,31 +701,37 @@ namespace Gestao_de_Alunos
         static void MelhorPiorAluno(sAluno[] sAlu)
         {
             // Indices para saber as posições dos alunos
-            int indicePiorAluno = 0;
+            int indicePiorAluno = 0; 
             int indiceMelhorAluno = 0;
 
-            // Assume a melhor e a pior média pelo primeiro aluno da lista
-            float melhorMedia = sAlu[0].medAlu;
-            float piorMedia = sAlu[0].medAlu;
+            float melhorMedia = -1;
+            float piorMedia = -1;
 
-            // Ciclo para encontrar o melhor e o pior aluno
+            // Ciclo para encontrar o melhor e o pior aluno que nunca tiveram dividas 
             for (int i = 0; i < sAlu.Length; i++)
             {
-                // Verifica se a média do aluno atual é maior que a do melhor aluno
-                if (sAlu[i].medAlu > melhorMedia)
+                // Ciclo para verificar se o aluno nunca teve dívidas
+                for (int j = 0; j < sAlu[i].mesesParaPagar.Length; j++)
                 {
-                    melhorMedia = sAlu[i].medAlu;
-                    indiceMelhorAluno = i;
+                    // Verifica o estado do pagamento do mês (o mês tem que ser anterior ao atual)
+                    if (sAlu[i].mesesParaPagar[j].estadoPagamento == true && sAlu[i].mesesParaPagar[j].mes <= DateTime.Now.Month)
+                    {
+                        // Verifica se a média do aluno atual é maior que a do melhor aluno
+                        if (sAlu[i].medAlu > melhorMedia)
+                        {
+                            melhorMedia = sAlu[i].medAlu;
+                            indiceMelhorAluno = i;
+                        }
+                        // Verifica se a média do aluno atual é menor que a do pior aluno
+                        else if (sAlu[i].medAlu < piorMedia)
+                        {
+                            piorMedia = sAlu[i].medAlu;
+                            indicePiorAluno = i;
+                        }
+                    }
                 }
-                // Verifica se a média do aluno atual é menor que a do pior aluno
-                else if (sAlu[i].medAlu < piorMedia)
-                {
-                    piorMedia = sAlu[i].medAlu;
-                    indicePiorAluno = i;
-                }
-            }
-
-            // Exibe o melhor e pior aluno
+            }            
+            // Exibe o melhor e pior aluno que nnca tiveram dividas 
             Console.WriteLine($"Melhor aluno: {sAlu[indiceMelhorAluno].nomAlu}, Média: {melhorMedia}");
             Console.WriteLine($"Pior aluno: {sAlu[indicePiorAluno].nomAlu}, Média: {piorMedia}");
         }
@@ -879,6 +886,7 @@ namespace Gestao_de_Alunos
                         alunosComDividas++;
                     }
                 }
+
                 // Calcula a percentagem de alunos com dívidas
                 float percentagemAlunosDividas = (float)alunosComDividas / sAlu.Length * 100;
                 Console.WriteLine($"A percentagem de alunos com dívidas é: {percentagemAlunosDividas:F2}%");
