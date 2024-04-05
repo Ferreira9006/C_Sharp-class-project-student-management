@@ -1,4 +1,9 @@
-﻿using System;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Text;
 
 namespace Gestao_de_Alunos
 {
@@ -75,6 +80,7 @@ namespace Gestao_de_Alunos
         {
             sAluno[] sAlu = new sAluno[0]; // Array para armazenar os alunos
             int opcaoMenu = 0; // Opção do menu
+            string ficheiro = @"C:/Temp/alunos.csv"; // def de path + ficheiro csv
 
             // Loop do menu
             do
@@ -150,10 +156,12 @@ namespace Gestao_de_Alunos
 
                     case 12:
                         Console.Clear(); // Limpa a Consola
+                        escreverArrayParaFicheiro(sAlu, ficheiro);
                         break;
 
                     case 13:
                         Console.Clear(); // Limpa a Consola
+                        lerFicheiroParaArray(ref sAlu, ficheiro);
                         break;
 
                     case 14:
@@ -859,7 +867,6 @@ namespace Gestao_de_Alunos
             // Verifica se há alunos na lista
             if (sAlu.Length > 0)
             {
-
                 int alunosComDividas = 0;
 
                 // Itera sobre cada aluno na lista
@@ -878,5 +885,112 @@ namespace Gestao_de_Alunos
                 Console.WriteLine("Não existem alunos na lista.");
         }
 
+        // Função para escrever o array de alunos no arquivo
+        static void escreverArrayParaFicheiro(sAluno[] sAlu, string ficheiro)
+        {
+            // para guardar chars: ç ã ê á ... no ficheiro
+            Console.OutputEncoding = Encoding.UTF8;
+            // abrir o ficheiro para ESCRITA
+            StreamWriter textWriter = new StreamWriter(ficheiro);
+
+            // separar campo a campo da esturtura por ponto e vírgula
+            CsvConfiguration csvConf = new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                Delimiter = ";"
+            };
+
+            // var que escrever cada registo
+            CsvWriter writer = new CsvWriter(textWriter, csvConf);
+
+            // definir o cabeçalho dos campos no ficheiro
+            writer.WriteField("Codigo");
+            writer.WriteField("Nome");
+            writer.WriteField("Idade");
+            writer.WriteField("Media");
+            writer.WriteField("Propina");
+            writer.WriteField("Saldo");
+            for (int j = 0; j < 12; j++)
+            {
+                writer.WriteField($"Mes{j + 1}");
+                writer.WriteField($"Mes{j + 1}_Pago");
+                writer.WriteField($"Mes{j + 1}_Divida");
+            }
+            writer.NextRecord();
+
+            // ciclo para leitura do array e registo de estruturas no ficheiro
+            for (int i = 0; i < sAlu.Length; i++)
+            {
+                // Escrever o cabeçalho dos campos no arquivo
+                writer.WriteField(sAlu[i].codAlu);
+                writer.WriteField(sAlu[i].nomAlu);
+                writer.WriteField(Convert.ToString(sAlu[i].idaAlu));
+                writer.WriteField(Convert.ToString(sAlu[i].medAlu));
+                writer.WriteField(Convert.ToString(sAlu[i].proAlu));
+                writer.WriteField(Convert.ToString(sAlu[i].salAlu));
+
+                foreach (sAluno.EstadoMensal mes in sAlu[i].mesesParaPagar)
+                {
+                    writer.WriteField(Convert.ToString(mes.mes));
+                    writer.WriteField(Convert.ToString(mes.estadoPagamento));
+                    writer.WriteField(Convert.ToString(mes.valorDivida));
+                }
+
+                writer.NextRecord();
+            }
+
+            textWriter.Close(); // fecho do ficheiro
+        }
+
+        static void lerFicheiroParaArray(ref sAluno[] sAlu, string ficheiro)
+        {
+            int i;
+            // Abrir o ficheiro para LEITURA
+            StreamReader textReader = new StreamReader(ficheiro);
+
+            // Configurar o leitor CSV
+            CsvConfiguration csvConf2 = new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                Delimiter = ";"
+            };
+
+            // Criar o leitor CSV
+            CsvReader reader = new CsvReader(textReader, csvConf2);
+
+            // Ignorar o cabeçalho
+            i = 0;
+            while (reader.Read() == true)
+            {
+                if (i > 0)
+                {
+                    // carregar o array com os registos do ficheiro s/ cabeçalho
+                    Array.Resize(ref sAlu, sAlu.Length + 1);
+                    sAlu[i - 1] = new sAluno();
+
+                    // Ler dados básicos do aluno
+                    sAlu[i - 1].codAlu = reader.GetField(0);
+                    sAlu[i - 1].nomAlu = reader.GetField(1);
+                    sAlu[i - 1].idaAlu = Convert.ToInt32(reader.GetField(2));
+                    sAlu[i - 1].medAlu = Convert.ToSingle(reader.GetField(3));
+                    sAlu[i - 1].proAlu = Convert.ToSingle(reader.GetField(4));
+                    sAlu[i - 1].salAlu = Convert.ToSingle(reader.GetField(5));
+
+                    // Inicializar o array mesesParaPagar
+                    sAlu[i - 1].mesesParaPagar = new sAluno.EstadoMensal[12];
+
+                    // Ler dados dos meses para pagar
+                    for (int j = 0; j < 12; j++)
+                    {
+                        sAlu[i - 1].mesesParaPagar[j].mes = Convert.ToInt32(j + 1);
+                        sAlu[i - 1].mesesParaPagar[j].estadoPagamento = bool.Parse(reader.GetField(7 + (j * 3)));
+                        sAlu[i - 1].mesesParaPagar[j].valorDivida = Convert.ToSingle(reader.GetField(8 + (j * 3)));
+                    }
+                }
+                i++;
+            }
+            textReader.Close();
+
+            Console.WriteLine("O ficheiro foi carregado com sucesso. Prima Enter para continuar.");
+            Console.ReadKey();
+        }
     }
 }
