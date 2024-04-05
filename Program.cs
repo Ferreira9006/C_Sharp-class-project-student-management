@@ -49,18 +49,21 @@ namespace Gestao_de_Alunos
         // Método para verificar se há uma dívida no próximo mês
         public bool DividaProxima(int mesAtual)
         {
-            int proximoMes = mesAtual + 1;
+            // Posição no Array e não o mês
+            int proximoMes = mesAtual;
 
             // Verifica se o próximo mês existe na lista de mesesParaPagar
             if (proximoMes < mesesParaPagar.Length)
             {
+                // 1 2 3 4 5 6 7 8 9 10 11 12 (meses)
+                // 0 1 2 3 4 5 6 7 8 9  10 11 (Array)
+
                 // Verifica se o estado de pagamento do próximo mês é falso (ou seja, há uma dívida)
                 if (!mesesParaPagar[proximoMes].estadoPagamento)
                 {
                     return true; // Há uma dívida no próximo mês
                 }
             }
-
             return false; // Não há dívida no próximo mês
         }
 
@@ -615,40 +618,32 @@ namespace Gestao_de_Alunos
         // Mostra alunos com dividas e alunos que já tiveram dividas!
         static void AlunosComDividas(sAluno[] sAlu)
         {
-            bool existiuDividas = false;
-
             // Iterar sobre todos os alunos 
             for (int i = 0; i < sAlu.Length; i++)
             {
-                bool temDividas = false;
-                int mesesEmAtraso = 0;
-                float valorTotalDivida = 0;
-
-                // Iterar sobre os meses para pagar
-                for (int j = 0; j < sAlu[i].mesesParaPagar.Length; j++)
-                {
-                    // Verificar se o pagamento do mês não foi feito
-                    if (!sAlu[i].mesesParaPagar[j].estadoPagamento)
-                    {
-                        temDividas = true;
-                        mesesEmAtraso++;
-                        valorTotalDivida = valorTotalDivida + sAlu[i].mesesParaPagar[j].valorDivida;
-                    }
-                }
-
                 // Verificar se o aluno teve dívidas
-                if (temDividas)
+                if (AlunoTemDividas(sAlu[i]))
                 {
-                    Console.WriteLine($"O aluno {sAlu[i].nomAlu} ({sAlu[i].codAlu}) tem {mesesEmAtraso} mês/meses em atraso com um total de {valorTotalDivida} euros.");
+                    Console.WriteLine($"O aluno {sAlu[i].nomAlu} ({sAlu[i].codAlu}) tem dividas.");
                 }
                 else if (sAlu[i].teveDividas)
                 {
                     Console.WriteLine($"O aluno {sAlu[i].nomAlu} ({sAlu[i].codAlu}) já teve dívidas, mas está em dia agora.");
                 }
             }
+        }
 
-            if (!existiuDividas)
-                Console.WriteLine($"Nenhum aluno teve dividas.");
+        // Verifica se um aluno tem dividas!
+        static bool AlunoTemDividas(sAluno aluno)
+        {
+            // Iterar sobre os meses para pagar do aluno
+            for (int j = 0; j < aluno.mesesParaPagar.Length; j++)
+            {
+                // Verificar se o pagamento do mês não foi feito
+                if (!aluno.mesesParaPagar[j].estadoPagamento && aluno.mesesParaPagar[j].mes < DateTime.Now.Month)
+                    return true;
+            }
+            return false;
         }
 
         // Verifica se os alunos têm dívidas futuras no próximo mês
@@ -701,7 +696,7 @@ namespace Gestao_de_Alunos
         static void MelhorPiorAluno(sAluno[] sAlu)
         {
             // Indices para saber as posições dos alunos
-            int indicePiorAluno = 0; 
+            int indicePiorAluno = 0;
             int indiceMelhorAluno = 0;
 
             float melhorMedia = -1;
@@ -730,7 +725,7 @@ namespace Gestao_de_Alunos
                         }
                     }
                 }
-            }            
+            }
             // Exibe o melhor e pior aluno que nnca tiveram dividas 
             Console.WriteLine($"Melhor aluno: {sAlu[indiceMelhorAluno].nomAlu}, Média: {melhorMedia}");
             Console.WriteLine($"Pior aluno: {sAlu[indicePiorAluno].nomAlu}, Média: {piorMedia}");
@@ -744,10 +739,8 @@ namespace Gestao_de_Alunos
             {
                 // Verifica se o aluno não teve dívidas
                 if (!sAlu[i].teveDividas)
-                {
                     // Mostra as informações do aluno
                     MostrarAlunos(sAlu, 0);
-                }
             }
         }
 
@@ -813,9 +806,7 @@ namespace Gestao_de_Alunos
                 Console.WriteLine($"A média das idades dos alunos é: {somaIdades / sAlu.Length}");
             }
             else
-            {
                 Console.WriteLine("Não existem alunos na lista.");
-            }
         }
 
         // Calcula a média das médias dos alunos
@@ -836,9 +827,7 @@ namespace Gestao_de_Alunos
                 Console.WriteLine($"A média das médias dos alunos é: {somaMedias / sAlu.Length}");
             }
             else
-            {
                 Console.WriteLine("Não existem alunos na lista.");
-            }
         }
 
         // Conta quantos alunos têm saldo negativo
@@ -854,18 +843,14 @@ namespace Gestao_de_Alunos
                 {
                     // Verifica se o saldo do aluno é negativo e incrementa o contador
                     if (aluno.salAlu < 0)
-                    {
                         contador++;
-                    }
                 }
 
                 // Número de alunos com saldo negativo
                 Console.WriteLine($"O número de alunos com saldo negativo é: {contador}");
             }
             else
-            {
                 Console.WriteLine("Não existem alunos na lista.");
-            }
         }
 
         // Calcula a percentagem de alunos que já tiveram dívidas
@@ -882,9 +867,7 @@ namespace Gestao_de_Alunos
                 {
                     // Verifica se o aluno já teve dívidas e incrementa o contador
                     if (aluno.teveDividas)
-                    {
                         alunosComDividas++;
-                    }
                 }
 
                 // Calcula a percentagem de alunos com dívidas
@@ -892,9 +875,7 @@ namespace Gestao_de_Alunos
                 Console.WriteLine($"A percentagem de alunos com dívidas é: {percentagemAlunosDividas:F2}%");
             }
             else
-            {
                 Console.WriteLine("Não existem alunos na lista.");
-            }
         }
 
     }
