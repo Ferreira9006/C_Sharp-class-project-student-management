@@ -150,11 +150,8 @@ namespace Gestao_de_Alunos
         // Mostra informações de todos os alunos na estrutura Alunos
         public static void MostrarAlunos(Aluno[] Alunos, int flag)
         {
-            OperacoesGerais.VerificarQuantidadeAlunos(Alunos);
-
             for (int i = 0; i < Alunos.Length; i++)
                 MostrarInformacaoAluno(Alunos[i], ref flag);
-
         }
 
         // Mostra informações detalhadas de um aluno
@@ -183,17 +180,18 @@ namespace Gestao_de_Alunos
                     );
 
                 Console.WriteLine("Propinas - Mês:");
+
                 for (int i = 0; i < reg.mesesParaPagar.Length; i++)
                 {
                     // Representação visual do estado do Pagamento
                     string estadoDoPagamento;
 
                     // Se o valor presente no estadoPagamento for TRUE
-                    /*if (reg.mesesParaPagar[i].estadoPagamento)
+                    if (reg.mesesParaPagar[i].estadoPagamento)
                         estadoDoPagamento = "Pago";
                     else
-                        estadoDoPagamento = "Não Pago";*/
-                    estadoDoPagamento = (reg.mesesParaPagar[i].estadoPagamento) ? "Pago" : "Não Pago";
+                        estadoDoPagamento = "Não Pago";
+                    //estadoDoPagamento = (reg.mesesParaPagar[i].estadoPagamento) ? "Pago" : "Não Pago";
 
                     // Apenas para dizer qual é o mês atual
                     if (i + 1 == DateTime.Now.Month)
@@ -212,9 +210,6 @@ namespace Gestao_de_Alunos
         // Consulta informações de um aluno específico
         public static void ConsultarAluno(Aluno[] Alunos)
         {
-            // Verifica se há alunos na lista
-            OperacoesGerais.VerificarQuantidadeAlunos(Alunos);
-
             string codigoAluno;
 
             MostrarAlunos(Alunos, 0); // Mostra a lista de alunos disponíveis
@@ -245,9 +240,6 @@ namespace Gestao_de_Alunos
         // Altera dados de um aluno específico
         public static void AlterarDadosAluno(Aluno[] Alunos)
         {
-            // Verifica se há alunos na lista
-            OperacoesGerais.VerificarQuantidadeAlunos(Alunos);
-
             string codigoAluno;
             bool encontrouAluno = false;
 
@@ -296,9 +288,6 @@ namespace Gestao_de_Alunos
         // Elimina um aluno da estrutura Alunos
         public static void EliminarAluno(ref Aluno[] Alunos)
         {
-            // Verifica se há alunos na lista
-            OperacoesGerais.VerificarQuantidadeAlunos(Alunos);
-
             string codigoAluno;
             bool encontrouAluno = false;
             int indexToRemove;
@@ -504,9 +493,6 @@ namespace Gestao_de_Alunos
         // Verifica se os alunos têm dívidas futuras no próximo mês
         public static void VerificarDividasFuturas(Aluno[] Aluno, int mesAtual)
         {
-            // Verifica se há alunos na lista
-            OperacoesGerais.VerificarQuantidadeAlunos(Aluno);
-
             Console.WriteLine("Dívidas futuras:");
 
             // Iterar sobre todos os alunos
@@ -523,9 +509,6 @@ namespace Gestao_de_Alunos
         // Carrega saldo para um aluno específico
         public static void CarregarSaldo(Aluno[] Alunos)
         {
-            // Verifica se há alunos na lista
-            OperacoesGerais.VerificarQuantidadeAlunos(Alunos);
-
             // Variáveis para armazenar o código do aluno e o valor a ser carregado
             string codAluno;
             int valor;
@@ -554,7 +537,7 @@ namespace Gestao_de_Alunos
 
     public class OperacoesGerais
     {
-        // Função que verifica a existência de alunosS
+        // Função que verifica a existência de alunos
         public static bool VerificarQuantidadeAlunos (Aluno[] Alunos)
         {
             if (Alunos.Length == 0)
@@ -605,9 +588,6 @@ namespace Gestao_de_Alunos
         // Função para escrever o array de alunos no arquivo
         public static void escreverArrayParaFicheiro(Aluno[] Alunos, string ficheiro)
         {
-            // Verifica se há alunos na lista
-            OperacoesGerais.VerificarQuantidadeAlunos(Alunos);
-
             // para guardar chars: ç ã ê á ... no ficheiro
             Console.OutputEncoding = Encoding.UTF8;
             // abrir o ficheiro para ESCRITA
@@ -978,8 +958,6 @@ namespace Gestao_de_Alunos
         // Menu de opções
         static int ListaMenu(Aluno[] Alunos)
         {
-            Console.Clear(); // Limpa a Consola
-
             // Exibe as opções de menu e retorna a opção escolhida
             Console.WriteLine("\nGestão de Alunos");
             Console.WriteLine("==========================================\n");
