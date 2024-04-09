@@ -67,7 +67,6 @@ namespace Gestao_de_Alunos
 
     public class OperacoesComAlunos
     {
-        // Insere alunos na estrutura
         // Solicita informações do aluno e insere na estrutura Alunos
         public static void InserirAlunos(ref Aluno[] Alunos)
         {
@@ -91,12 +90,10 @@ namespace Gestao_de_Alunos
                 do
                 {
                     codigoAluno = OperacoesGerais.LerStringValida("\nInsere o código do aluno: ");
+                    codigoValido = !OperacoesGerais.VerificarCodigo(Alunos, codigoAluno); // Verifica se o código do aluno já existe ou não
 
-                    // Verifica se o código do aluno já existe ou não
-                    codigoValido = !OperacoesGerais.VerificarCodigo(Alunos, codigoAluno);
                     if (!codigoValido)
                         Console.WriteLine("O código do aluno já existe.");
-
                 } while (!codigoValido);
 
                 Alunos[i].codAlu = codigoAluno;
@@ -119,28 +116,29 @@ namespace Gestao_de_Alunos
                     // Ciclo para definir o estado das dívidas
                     do
                     {
-                        Console.Write($"O aluno pagou o mês {Alunos[i].mesesParaPagar[j].mes}? (S/N) - ");
-                        entrada = Console.ReadLine().ToLower(); // Lê a entrada e converte para minúsculas
+                        entrada = OperacoesGerais.LerStringValida($"O aluno pagou o mês {Alunos[i].mesesParaPagar[j].mes}? (S/N) - ").ToLower(); // Lê a entrada e converte para minúsculas
 
-                        if (entrada == "s")
+                        switch (entrada)
                         {
-                            Alunos[i].mesesParaPagar[j].estadoPagamento = true;
-                            entradaValida = true; // Define a flag como true para sair do loop
-                        }
-                        else if (entrada == "n")
-                        {
-                            Alunos[i].mesesParaPagar[j].estadoPagamento = false;
+                            case "s":
+                                Alunos[i].mesesParaPagar[j].estadoPagamento = true;
+                                entradaValida = true; // Define a flag como true para sair do loop
+                                break;
 
-                            // Se o aluno não pagou o mês anterior ao atual
-                            if (Alunos[i].mesesParaPagar[j].mes < DateTime.Now.Month)
-                                Alunos[i].teveDividas = true;
+                            case "n":
+                                Alunos[i].mesesParaPagar[j].estadoPagamento = false;
 
-                            entradaValida = true; // Define a flag como true para sair do loop
-                        }
-                        else
-                        {
-                            Console.WriteLine("Entrada inválida. Por favor, insira 'S' ou 'N'.");
-                            entradaValida = false; // Define a flag como false para continuar do loop
+                                // Se o aluno não pagou o mês anterior ao atual
+                                if (Alunos[i].mesesParaPagar[j].mes < DateTime.Now.Month)
+                                    Alunos[i].teveDividas = true;
+
+                                entradaValida = true; // Define a flag como true para sair do loop
+                                break;
+
+                            default:
+                                Console.WriteLine("Entrada inválida. Por favor, insira 'S' ou 'N'.");
+                                entradaValida = false; // Define a flag como false para continuar do loop
+                                break;
                         }
                     } while (!entradaValida);
                 }
@@ -187,11 +185,7 @@ namespace Gestao_de_Alunos
                     string estadoDoPagamento;
 
                     // Se o valor presente no estadoPagamento for TRUE
-                    if (reg.mesesParaPagar[i].estadoPagamento)
-                        estadoDoPagamento = "Pago";
-                    else
-                        estadoDoPagamento = "Não Pago";
-                    //estadoDoPagamento = (reg.mesesParaPagar[i].estadoPagamento) ? "Pago" : "Não Pago";
+                    estadoDoPagamento = (reg.mesesParaPagar[i].estadoPagamento) ? "Pago" : "Não Pago";
 
                     // Apenas para dizer qual é o mês atual
                     if (i + 1 == DateTime.Now.Month)
@@ -214,8 +208,7 @@ namespace Gestao_de_Alunos
 
             MostrarAlunos(Alunos, 0); // Mostra a lista de alunos disponíveis
 
-            Console.Write("Qual o código do aluno que quer consultar? - ");
-            codigoAluno = Console.ReadLine();
+            codigoAluno = OperacoesGerais.LerStringValida("Qual o código do aluno que quer consultar? - ");
 
             bool encontrouAluno = false;
             int flag = 1; // Define a flag para mostrar a informação detalhada do aluno
@@ -246,8 +239,7 @@ namespace Gestao_de_Alunos
             // Mostra os alunos para que o utilizador possa escolher qual alterar
             MostrarAlunos(Alunos, 0);
 
-            Console.WriteLine("Qual o código do aluno que quer alterar?");
-            codigoAluno = Console.ReadLine();
+            codigoAluno = OperacoesGerais.LerStringValida("Qual o código do aluno que quer alterar? ");
 
             // Itera sobre todos os alunos
             for (int i = 0; i < Alunos.Length; i++)
@@ -256,20 +248,11 @@ namespace Gestao_de_Alunos
                 if (Alunos[i].codAlu == codigoAluno)
                 {
                     // Solicita ao utilizador que insira os novos dados do aluno
-                    Console.Write("Insere o nome: ");
-                    Alunos[i].nomAlu = Console.ReadLine();
-
-                    Console.Write("Insere a idade: ");
-                    Alunos[i].idaAlu = Convert.ToInt32(Console.ReadLine());
-
-                    Console.Write("Insere média: ");
-                    Alunos[i].medAlu = Convert.ToSingle(Console.ReadLine());
-
-                    Console.Write("Insere a propina do aluno: ");
-                    Alunos[i].proAlu = Convert.ToSingle(Console.ReadLine());
-
-                    Console.Write("Insere o saldo: ");
-                    Alunos[i].salAlu = Convert.ToSingle(Console.ReadLine());
+                    Alunos[i].nomAlu = OperacoesGerais.LerStringValida("Insere o nome: ");
+                    Alunos[i].idaAlu = Convert.ToInt32(OperacoesGerais.LerInteiroValido("Insere a idade: ", 0, 100));
+                    Alunos[i].medAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere a média: ", 0, 20));
+                    Alunos[i].proAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere a propina do aluno: "));
+                    Alunos[i].salAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere o saldo: "));
 
                     // Verifica se o saldo do aluno é negativo (indicando dívidas)
                     if (Alunos[i].salAlu < 0)
@@ -289,54 +272,57 @@ namespace Gestao_de_Alunos
         public static void EliminarAluno(ref Aluno[] Alunos)
         {
             string codigoAluno;
-            bool encontrouAluno = false;
-            int indexToRemove;
+            string entrada;
+            bool entradaValida;
+            bool alunoEncontrado = false;
 
             // Mostra os alunos para que o utilizador possa escolher qual remover
-            MostrarAlunos(Alunos, 1);
+            MostrarAlunos(Alunos, 0);
 
             // Solicita o código do aluno que o utilizador deseja remover
-            Console.WriteLine("Qual o código do aluno que deseja eliminar?");
-            codigoAluno = Console.ReadLine();
+            codigoAluno = OperacoesGerais.LerStringValida("Qual o código do aluno que deseja eliminar? ");
 
-            // Itera sobre todos os alunos na lista
-            for (int i = 0; i < Alunos.Length; i++)
+            for (int i = 0; i < Alunos.Length; i++) // Itera sobre todos os alunos na lista
             {
-                // Verifica se o código do aluno atual corresponde ao código fornecido pelo utilizador
-                if (Alunos[i].codAlu == codigoAluno)
+                if (Alunos[i].codAlu == codigoAluno) // Verifica se o código do aluno atual corresponde ao código fornecido pelo utilizador
                 {
-                    // Confirmação da remoção com o utilizador
-                    Console.Write($"Pretende eliminar o aluno {codigoAluno}? (s/n): ");
-                    if (Console.ReadLine().ToLower() == "s")
-                    {
-                        indexToRemove = i;
+                    alunoEncontrado = true; // Confirma que encontrou o aluno
 
-                        // Move os elementos para preencher o espaço do aluno removido
-                        for (int j = indexToRemove; j < Alunos.Length - 1; j++)
+                    do // Confirmação da remoção com o utilizador
+                    {
+                        entrada = OperacoesGerais.LerStringValida($"Pretende eliminar o aluno {codigoAluno}? (s/n): ").ToLower(); // Lê a entrada e converte para minúsculas
+
+                        switch (entrada)
                         {
-                            Alunos[j] = Alunos[j + 1];
+                            case "s":
+                                // Move os elementos para preencher o espaço do aluno removido
+                                for (int j = i; j < Alunos.Length - 1; j++)
+                                    Alunos[j] = Alunos[j + 1];
+
+                                Array.Resize(ref Alunos, Alunos.Length - 1);
+
+                                Console.WriteLine($"O aluno com o código {codigoAluno} foi eliminado.");
+
+                                entradaValida = true; // Define a flag como true para sair do loop
+                                break;
+
+                            case "n":
+                                Console.WriteLine("Registo não eliminado.");
+
+                                entradaValida = true; // Define a flag como true para sair do loop
+                                break;
+
+                            default:
+                                Console.WriteLine("Entrada inválida. Por favor, insira 'S' ou 'N'.");
+                                entradaValida = false; // Define a flag como false para continuar no loop
+                                break;
                         }
-                        Array.Resize(ref Alunos, Alunos.Length - 1);
-
-                        Console.WriteLine($"O aluno com o código {codigoAluno} foi eliminado.");
-
-                        encontrouAluno = true;
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Registo não eliminado.");
-                        return; // Se o utilizador não quer eliminar a função, sai dela.
-                    }
+                    } while (!entradaValida);
                 }
             }
 
-            // Se o aluno não foi encontrado na lista
-            if (!encontrouAluno)
-            {
+            if (!alunoEncontrado)
                 Console.WriteLine($"O aluno com o código {codigoAluno} não foi encontrado.");
-                return; // Sai da função
-            }
         }
     }
 
@@ -345,105 +331,78 @@ namespace Gestao_de_Alunos
         // Paga as propinas de um aluno ou de todos os alunos
         public static void PagarPropinas(Aluno[] Alunos)
         {
-            Console.WriteLine("Deseja pagar as propinas de todos os alunos? S/N");
-            string resposta = Console.ReadLine().ToLower();
+            OperacoesComAlunos.MostrarAlunos(Alunos, 0); // Mostra a lista de alunos
 
-            // Se o utilizador optar por pagar as propinas de todos os alunos
-            if (resposta == "s")
+            string codigoAluno = OperacoesGerais.LerStringValida("Qual é o aluno que quer pagar as propinas? - ");
+
+            bool encontreiAluno = false;
+
+            // Itera sobre todos os alunos
+            for (int i = 0; i < Alunos.Length; i++)
             {
-                // Itera sobre todos os alunos
-                for (int i = 0; i < Alunos.Length; i++)
+                if (Alunos[i].codAlu == codigoAluno)
                 {
-                    // Itera sobre todos os meses de propinas do aluno atual
-                    for (int j = 0; i < Alunos[i].mesesParaPagar[j].mes; j++)
+                    encontreiAluno = true;
+
+                    // Mostra as opções de pagamento de propinas
+                    Console.WriteLine("1. Pagar as propinas do mês corrente.");
+                    Console.WriteLine("2. Pagar as propinas de outro mês que não seja o mês corrente.");
+                    Console.WriteLine($"3. Pagar todas as propinas do aluno {Alunos[i].nomAlu}. \n");
+
+                    // Recebe a escolha do utilizador
+                    int escolha = Convert.ToInt32(Console.ReadLine());
+
+                    switch (escolha)
                     {
-                        // Verifica se o mês atual não está pago
-                        if (Alunos[i].mesesParaPagar[j + 1].estadoPagamento == false)
-                        {
-                            // Marca o mês atual como pago
-                            Alunos[i].mesesParaPagar[j + 1].estadoPagamento = true;
-                        }
-                    }
+                        case 1:
+                            // Verifica se as propinas do mês corrente não foram pagas
+                            if (!Alunos[i].mesesParaPagar[DateTime.Now.Month - 1].estadoPagamento)
+                            {
+                                Alunos[i].mesesParaPagar[DateTime.Now.Month - 1].estadoPagamento = true; // Marca as propinas do mês corrente como pagas
+                                Console.WriteLine($"As propinas do mês atual para o aluno {Alunos[i].codAlu} foram pagas.");
+                            }
+                            else
+                                Console.WriteLine($"As propinas do mês atual para o aluno {Alunos[i].codAlu} já estão pagas.");
+                            break;
 
-                    // Informa que todas as propinas do aluno atual foram pagas
-                    Console.WriteLine($"As propinas de todos os meses do aluno {Alunos[i].nomAlu} (Cod:{Alunos[i].codAlu}) já estão pagas.");
-                }
-            }
-            // Se o utilizador optar por pagar as propinas de um aluno específico
-            else
-            {
-                // Mostra os alunos para que o utilizador possa escolher qual pagar as propinas
-                OperacoesComAlunos.MostrarAlunos(Alunos, 0);
+                        case 2:
+                            Console.WriteLine();
+                            int mesEscolhido = Convert.ToInt32(OperacoesGerais.LerInteiroValido("Escreva o número do mês que quer pagar: "));
 
-                Console.Write("Qual é o código de aluno que pretende pagar as propinas? - ");
-                string alunoPagarPropinas = Console.ReadLine();
+                            // Verifica se as propinas do mês escolhido não foram pagas
+                            if (!Alunos[i].mesesParaPagar[mesEscolhido - 1].estadoPagamento)
+                            {
+                                Alunos[i].mesesParaPagar[mesEscolhido - 1].estadoPagamento = true; // Marca as propinas do mês escolhido como pagas
+                                Console.WriteLine($"As propinas do mês {mesEscolhido} para o aluno {Alunos[i].codAlu} foram pagas.");
+                            }
+                            else
+                                Console.WriteLine($"As propinas do mês {mesEscolhido} para o aluno {Alunos[i].codAlu} já estão pagas.");
+                            break;
 
-                // Itera sobre todos os alunos
-                for (int i = 0; i < Alunos.Length; i++)
-                {
-                    // Verifica se o aluno atual corresponde ao código fornecido pelo utilizador
-                    if (Alunos[i].codAlu == alunoPagarPropinas)
-                    {
-                        // Mostra as opções de pagamento de propinas
-                        Console.WriteLine("1. Pagar as propinas do mês corrente.");
-                        Console.WriteLine("2. Pagar as propinas de outro mês que não seja o mês corrente.");
-                        Console.WriteLine($"3. Pagar todas as propinas do aluno {Alunos[i].nomAlu}. \n");
-
-                        // Recebe a escolha do utilizador
-                        int escolha = Convert.ToInt32(Console.ReadLine());
-
-                        switch (escolha)
-                        {
-                            case 1:
-                                // Verifica se as propinas do mês corrente não foram pagas
-                                if (Alunos[i].mesesParaPagar[DateTime.Now.Month - 1].estadoPagamento == false)
+                        case 3:
+                            // Itera sobre todos os meses de propinas do aluno atual
+                            for (int j = 0; j < Alunos[i].mesesParaPagar.Length; j++)
+                            {
+                                // Verifica se as propinas do mês atual não foram pagas
+                                if (!Alunos[i].mesesParaPagar[j].estadoPagamento)
                                 {
-                                    // Marca as propinas do mês corrente como pagas
-                                    Alunos[i].mesesParaPagar[DateTime.Now.Month - 1].estadoPagamento = true;
+                                    Alunos[i].mesesParaPagar[j].estadoPagamento = true; // Marca as propinas do mês atual como pagas
+                                    Console.WriteLine($"As propinas do aluno {Alunos[i].codAlu} foram pagas.");
                                 }
                                 else
-                                {
-                                    Console.WriteLine($"As propinas do mês atual para o aluno {Alunos[i].codAlu} já estão pagas.");
-                                }
-                                break;
+                                    Console.WriteLine($"As propinas do aluno {Alunos[i].codAlu} já estão pagas.");
+                            }
+                            break;
 
-                            case 2:
-                                Console.WriteLine("Escreva o número do mês que quer pagar: ");
-                                int mesEscolhido = Convert.ToInt32(Console.ReadLine());
-
-                                // Verifica se as propinas do mês escolhido não foram pagas
-                                if (Alunos[i].mesesParaPagar[mesEscolhido - 1].estadoPagamento == false)
-                                {
-                                    // Marca as propinas do mês escolhido como pagas
-                                    Alunos[i].mesesParaPagar[mesEscolhido - 1].estadoPagamento = true;
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"As propinas do mês {mesEscolhido} para o aluno {Alunos[i].codAlu} já estão pagas.");
-                                }
-                                break;
-
-                            case 3:
-                                // Itera sobre todos os meses de propinas do aluno atual
-                                for (int j = 0; j < Alunos[i].mesesParaPagar.Length; j++)
-                                {
-                                    // Verifica se as propinas do mês atual não foram pagas
-                                    if (Alunos[i].mesesParaPagar[j].estadoPagamento == false)
-                                    {
-                                        // Marca as propinas do mês atual como pagas
-                                        Alunos[i].mesesParaPagar[j].estadoPagamento = true;
-                                    }
-                                }
-                                Console.WriteLine($"As propinas do aluno {Alunos[i].codAlu} já estão pagas.");
-                                break;
-
-                            default:
-                                Console.WriteLine("Opção Inválida");
-                                break;
-                        }
+                        default:
+                            Console.WriteLine("Opção Inválida");
+                            break;
                     }
                 }
             }
+
+            if (!encontreiAluno)
+                Console.WriteLine($"O aluno com o código {codigoAluno} não foi encontrado.");
         }
 
         // Mostra alunos com dividas e alunos que já tiveram dividas!
@@ -934,21 +893,25 @@ namespace Gestao_de_Alunos
 
                     case 11:
                         Console.Clear(); // Limpa a Consola
+                        Console.WriteLine("********** Mostrar Alunos sem Dívidas **********\n");
                         OperacoesFinanceiras.AlunoSemDividas(Alunos);
                         break;
 
                     case 12:
                         Console.Clear(); // Limpa a Consola
+                        Console.WriteLine("********** Exportar Lista de Alunos para ficheiro **********\n");
                         OperacoesGerais.escreverArrayParaFicheiro(Alunos, ficheiro);
                         break;
 
                     case 13:
                         Console.Clear(); // Limpa a Consola
+                        Console.WriteLine("********** Importar ficheiro para Lista de Alunos **********\n");
                         OperacoesGerais.lerFicheiroParaArray(ref Alunos, ficheiro);
                         break;
 
                     case 14:
                         Console.Clear(); // Limpa a Consola
+                        Console.WriteLine("********** Estatisticas **********\n");
                         Estatistica.ExibirOpcoesEstatisticas(Alunos);
                         break;
                 }
