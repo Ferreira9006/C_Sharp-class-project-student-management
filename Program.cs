@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Gestao_de_Alunos
 {
+    // Programa para gestão de Alunos
     // Estrutura de dados para representar um Aluno
     // Autores : Gabriel / Rui / Douglas 
     public class Aluno
@@ -56,7 +57,7 @@ namespace Gestao_de_Alunos
         {
             // Verifica se o próximo mês existe na lista de mesesParaPagar
             if (proximoMes < mesesParaPagar.Length)
-            {   
+            {
                 // Verifica se o estado de pagamento do próximo mês é falso (ou seja, há uma dívida)
                 if (!mesesParaPagar[proximoMes].estadoPagamento)
                     return true; // Há uma dívida no próximo mês
@@ -71,7 +72,7 @@ namespace Gestao_de_Alunos
         public static void InserirAlunos(ref Aluno[] Alunos)
         {
             // Quantidade de alunos a inserir
-            int quantidadeAlunos = Convert.ToInt32(OperacoesGerais.LerInteiroValido("Digite o número de alunos a inserir: "));
+            int quantidadeAlunos = OperacoesGerais.LerInteiroValido("Digite o número de alunos a inserir: ");
 
             int tamanhoAtual = Alunos.Length;
             int newArraySize = tamanhoAtual + quantidadeAlunos;
@@ -98,10 +99,10 @@ namespace Gestao_de_Alunos
 
                 Alunos[i].codAlu = codigoAluno;
                 Alunos[i].nomAlu = OperacoesGerais.LerStringValida("Insere o nome: ");
-                Alunos[i].idaAlu = Convert.ToInt32(OperacoesGerais.LerInteiroValido("Insere a idade: ", 0, 100));
-                Alunos[i].medAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere a média: ", 0, 20));
-                Alunos[i].proAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere a propina do aluno: "));
-                Alunos[i].salAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere o saldo: "));
+                Alunos[i].idaAlu = OperacoesGerais.LerInteiroValido("Insere a idade: ", 0, 100);
+                Alunos[i].medAlu = OperacoesGerais.LerDecimalValido("Insere a média: ", 0, 20);
+                Alunos[i].proAlu = OperacoesGerais.LerDecimalValido("Insere a propina do aluno: ");
+                Alunos[i].salAlu = OperacoesGerais.LerDecimalValido("Insere o saldo: ");
 
                 // Se o aluno tem um saldo negativo, teveDividas = true
                 if (Alunos[i].salAlu < 0)
@@ -151,7 +152,7 @@ namespace Gestao_de_Alunos
             // flag = 0 (consulta de baixo nível no aluno)
             // flag = 1 (consulta de alto nível no aluno)
             for (int i = 0; i < Alunos.Length; i++)
-            { 
+            {
                 switch (flag)
                 {
                     case 0: MostrarInformacaoBasicaAluno(Alunos[i]); break;
@@ -184,7 +185,7 @@ namespace Gestao_de_Alunos
                 $"Saldo: {reg.salAlu} euro(s) "
                 );
 
-            Console.WriteLine("Propinas - Mês:");
+            Console.WriteLine("\nPropinas - Mês:");
 
             for (int i = 0; i < reg.mesesParaPagar.Length; i++)
             {
@@ -209,7 +210,7 @@ namespace Gestao_de_Alunos
 
             MostrarAlunos(Alunos, 0); // Mostra a lista de alunos disponíveis
 
-           string codigoAluno = OperacoesGerais.LerStringValida("Qual o código do aluno que quer consultar? - ");
+            string codigoAluno = OperacoesGerais.LerStringValida("Qual o código do aluno que quer consultar? - ");
 
             // Itera sobre todos os alunos
             foreach (var aluno in Alunos)
@@ -247,7 +248,7 @@ namespace Gestao_de_Alunos
                 {
                     // Solicita ao utilizador que insira os novos dados do aluno
                     Alunos[i].nomAlu = OperacoesGerais.LerStringValida("Insere o nome: ");
-                    Alunos[i].idaAlu = Convert.ToInt32(OperacoesGerais.LerInteiroValido("Insere a idade: ", 0, 100));
+                    Alunos[i].idaAlu = OperacoesGerais.LerInteiroValido("Insere a idade: ", 0, 100);
                     Alunos[i].medAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere a média: ", 0, 20));
                     Alunos[i].proAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere a propina do aluno: "));
                     Alunos[i].salAlu = Convert.ToSingle(OperacoesGerais.LerDecimalValido("Insere o saldo: "));
@@ -365,7 +366,7 @@ namespace Gestao_de_Alunos
 
                         case 2:
                             Console.WriteLine();
-                            int mesEscolhido = Convert.ToInt32(OperacoesGerais.LerInteiroValido("Escreva o número do mês que quer pagar: "));
+                            int mesEscolhido = OperacoesGerais.LerInteiroValido("Escreva o número do mês que quer pagar: ");
 
                             // Verifica se as propinas do mês escolhido não foram pagas
                             if (!Alunos[i].mesesParaPagar[mesEscolhido - 1].estadoPagamento)
@@ -480,7 +481,7 @@ namespace Gestao_de_Alunos
                 if (Alunos[i].codAlu == codAluno)
                 {
                     // Solicita o valor a ser carregado para o saldo do aluno
-                    valor = Convert.ToInt32(OperacoesGerais.LerInteiroValido("Qual é o montante que quer carregar o saldo? - "));
+                    valor = OperacoesGerais.LerInteiroValido("Qual é o montante que quer carregar o saldo? - ");
 
                     // Adiciona o valor ao saldo do aluno correspondente
                     Alunos[i].salAlu = Alunos[i].salAlu + valor;
@@ -495,7 +496,7 @@ namespace Gestao_de_Alunos
     public class OperacoesGerais
     {
         // Função que verifica a existência de alunos
-        public static bool VerificarQuantidadeAlunos (Aluno[] Alunos)
+        public static bool VerificarQuantidadeAlunos(Aluno[] Alunos)
         {
             if (Alunos.Length == 0)
                 return true;
@@ -713,7 +714,7 @@ namespace Gestao_de_Alunos
             Console.WriteLine("4. Percentagem de alunos com dívidas");
             Console.WriteLine("5. Todas\n");
 
-            int opcao = Convert.ToInt16(OperacoesGerais.LerInteiroValido("Escolha uma opção: "));
+            int opcao = OperacoesGerais.LerInteiroValido("Escolha uma opção: ");
 
             switch (opcao)
             {
@@ -939,15 +940,15 @@ namespace Gestao_de_Alunos
                 Console.WriteLine("11. Mostrar Aluno que nunca teve dívidas");
                 Console.WriteLine("12. Carregar array de Alunos");
             }
-                Console.WriteLine("13. Carregar ficheiro com array");
+            Console.WriteLine("13. Carregar ficheiro com array");
 
             // Se não existirem alunos na lista, não mostra
             if (!OperacoesGerais.VerificarQuantidadeAlunos(Alunos))
                 Console.WriteLine("14. Estatisticas");
-            
+
             Console.WriteLine("0. Sair");
 
-            return Convert.ToInt32(OperacoesGerais.LerDecimalValido("\nEscolhe a opção: "));
-        }  
+            return OperacoesGerais.LerInteiroValido("\nEscolhe a opção: ");
+        }
     }
 }
