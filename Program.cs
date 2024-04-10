@@ -148,70 +148,68 @@ namespace Gestao_de_Alunos
         // Mostra informações de todos os alunos na estrutura Alunos
         public static void MostrarAlunos(Aluno[] Alunos, int flag)
         {
+            // flag = 0 (consulta de baixo nível no aluno)
+            // flag = 1 (consulta de alto nível no aluno)
             for (int i = 0; i < Alunos.Length; i++)
-                MostrarInformacaoAluno(Alunos[i], ref flag);
+            { 
+                switch (flag)
+                {
+                    case 0: MostrarInformacaoBasicaAluno(Alunos[i]); break;
+                    case 1: MostrarInformacaoAvancadaAluno(Alunos[i]); break;
+                    default: Console.WriteLine("Valor da Flag inválida."); break;
+                }
+            }
         }
 
-        // Mostra informações detalhadas de um aluno
-        public static void MostrarInformacaoAluno(Aluno reg, ref int flag)
+        // Mostra informações básicas de um aluno
+        public static void MostrarInformacaoBasicaAluno(Aluno reg)
         {
-            // flag = 0 (consulta de baixo nivel no aluno)
-            if (flag == 0)
-            {
-                Console.WriteLine(
+            Console.WriteLine(
                 $"Cód: {reg.codAlu} " +
                 $"Nome: {reg.nomAlu} " +
                 $"Idade: {reg.idaAlu} anos " +
                 $"Média de Notas: {reg.medAlu} valores"
                 );
-            }
-            else if (flag == 1)
+        }
+
+        // Mostra informações avançadas de um aluno
+        public static void MostrarInformacaoAvancadaAluno(Aluno reg)
+        {
+            Console.WriteLine(
+                $"Cód: {reg.codAlu} " +
+                $"Nome: {reg.nomAlu} " +
+                $"Idade: {reg.idaAlu} anos " +
+                $"Média de Notas: {reg.medAlu} valores " +
+                $"Propina: {reg.proAlu} euro(s) " +
+                $"Saldo: {reg.salAlu} euro(s) "
+                );
+
+            Console.WriteLine("Propinas - Mês:");
+
+            for (int i = 0; i < reg.mesesParaPagar.Length; i++)
             {
-                // flag = 1 (consulta de alto nível no aluno)
-                Console.WriteLine(
-                    $"Cód: {reg.codAlu} " +
-                    $"Nome: {reg.nomAlu} " +
-                    $"Idade: {reg.idaAlu} anos " +
-                    $"Média de Notas: {reg.medAlu} valores " +
-                    $"Propina: {reg.proAlu} euro(s) " +
-                    $"Saldo: {reg.salAlu} euro(s) "
-                    );
+                // Representação visual do estado do Pagamento
+                string estadoDoPagamento;
 
-                Console.WriteLine("Propinas - Mês:");
+                // Se o valor presente no estadoPagamento for TRUE
+                estadoDoPagamento = (reg.mesesParaPagar[i].estadoPagamento) ? "Pago" : "Não Pago";
 
-                for (int i = 0; i < reg.mesesParaPagar.Length; i++)
-                {
-                    // Representação visual do estado do Pagamento
-                    string estadoDoPagamento;
-
-                    // Se o valor presente no estadoPagamento for TRUE
-                    estadoDoPagamento = (reg.mesesParaPagar[i].estadoPagamento) ? "Pago" : "Não Pago";
-
-                    // Apenas para dizer qual é o mês atual
-                    if (i + 1 == DateTime.Now.Month)
-                        Console.WriteLine($"Mês {reg.mesesParaPagar[i].mes} (mês atual): {estadoDoPagamento}");
-                    else
-                        Console.WriteLine($"Mês {reg.mesesParaPagar[i].mes}: {estadoDoPagamento}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Valor da Flag inválida.");
-                return;
+                // Apenas para dizer qual é o mês atual
+                if (i + 1 == DateTime.Now.Month)
+                    Console.WriteLine($"Mês {reg.mesesParaPagar[i].mes} (mês atual): {estadoDoPagamento}");
+                else
+                    Console.WriteLine($"Mês {reg.mesesParaPagar[i].mes}: {estadoDoPagamento}");
             }
         }
 
         // Consulta informações de um aluno específico
         public static void ConsultarAluno(Aluno[] Alunos)
         {
-            string codigoAluno;
+            bool encontrouAluno = false;
 
             MostrarAlunos(Alunos, 0); // Mostra a lista de alunos disponíveis
 
-            codigoAluno = OperacoesGerais.LerStringValida("Qual o código do aluno que quer consultar? - ");
-
-            bool encontrouAluno = false;
-            int flag = 1; // Define a flag para mostrar a informação detalhada do aluno
+           string codigoAluno = OperacoesGerais.LerStringValida("Qual o código do aluno que quer consultar? - ");
 
             // Itera sobre todos os alunos
             foreach (var aluno in Alunos)
@@ -219,9 +217,9 @@ namespace Gestao_de_Alunos
                 // Verifica se o aluno atual corresponde ao código fornecido pelo utilizador
                 if (aluno.codAlu == codigoAluno)
                 {
-                    MostrarInformacaoAluno(aluno, ref flag); // Mostra as informações detalhadas do aluno
+                    MostrarInformacaoAvancadaAluno(aluno); // Mostra as informações detalhadas do aluno
                     encontrouAluno = true;
-                    break;
+                    break; // Não continua o ciclo porque já encontrou o aluno
                 }
             }
 
@@ -603,7 +601,6 @@ namespace Gestao_de_Alunos
         // Função para ler o ficheiro e criar o array
         public static void lerFicheiroParaArray(ref Aluno[] Alunos, string ficheiro)
         {
-            int i;
             // Abrir o ficheiro para LEITURA
             StreamReader textReader = new StreamReader(ficheiro);
 
@@ -617,7 +614,8 @@ namespace Gestao_de_Alunos
             CsvReader reader = new CsvReader(textReader, csvConf2);
 
             // Ignorar o cabeçalho
-            i = 0;
+            int i = 0;
+
             while (reader.Read() == true)
             {
                 if (i > 0)
